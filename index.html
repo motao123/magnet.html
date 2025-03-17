@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>磁力链接清理工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .input-box {
+            margin: 15px 0;
+        }
+        label {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+        textarea[readonly] {
+            background-color: #f0f0f0;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+        #convertBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #convertBtn:hover {
+            background-color: #45a049;
+        }
+        #copyBtn {
+            background-color: #2196F3;
+            color: white;
+        }
+        #copyBtn:hover {
+            background-color: #1e87db;
+        }
+        #clearBtn {
+            background-color: #f44336;
+            color: white;
+        }
+        #clearBtn:hover {
+            background-color: #da190b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>磁力链接清理工具</h2>
+        
+        <div class="input-box">
+            <label for="inputMagnet">输入处理前的磁力链接（支持多行）:</label>
+            <textarea id="inputMagnet" placeholder="粘贴你的磁力链接，每行一个，例如：
+magnet:?xt=urn:btih:72745371c77dd2a630d7dece1e120f88bdbea93b&dn=MIDA-022-C&tr=...
+magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12&tr=..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button id="convertBtn" onclick="cleanMagnet()">转换</button>
+            <button id="copyBtn" onclick="copyResult()">复制结果</button>
+            <button id="clearBtn" onclick="clearContent()">清除</button>
+        </div>
+        
+        <div class="input-box">
+            <label for="outputMagnet">处理后的磁力链接:</label>
+            <textarea id="outputMagnet" placeholder="处理结果会显示在这里，每行一个" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        function cleanMagnet() {
+            // 获取输入框内容并按行分割
+            const input = document.getElementById("inputMagnet").value.trim();
+            const lines = input.split('\n');
+            const pattern = /(magnet:\?xt=urn:btih:[0-9a-fA-F]{40})(&dn=[^&]*)?/i;
+            let results = [];
+
+            // 处理每一行
+            lines.forEach(line => {
+                const match = line.match(pattern);
+                if (match) {
+                    const result = match[2] ? match[1] + match[2] : match[1];
+                    results.push(result);
+                } else if (line.trim()) { // 非空行但无效时提示
+                    results.push("无效的磁力链接: " + line.trim());
+                }
+            });
+
+            // 输出结果
+            document.getElementById("outputMagnet").value = results.join('\n');
+        }
+
+        function copyResult() {
+            const output = document.getElementById("outputMagnet");
+            output.select();
+            document.execCommand("copy");
+            alert("已复制到剪贴板！");
+        }
+
+        function clearContent() {
+            // 清除两个输入框的内容
+            document.getElementById("inputMagnet").value = "";
+            document.getElementById("outputMagnet").value = "";
+        }
+    </script>
+</body>
+</html>
